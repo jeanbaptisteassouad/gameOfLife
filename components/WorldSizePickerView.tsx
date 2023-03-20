@@ -6,7 +6,7 @@ const WorldSizePickerView = ({
   setColumnCount,
 }) => {
   return (
-    <div style={{display: 'flex', gap: '2rem', justifyContent: 'space-between', width: '100%'}}>
+    <div style={{display: 'flex', gap: 'var(--var-main-gap)', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap'}}>
       <Button
         setRowCount={setRowCount}
         setColumnCount={setColumnCount}

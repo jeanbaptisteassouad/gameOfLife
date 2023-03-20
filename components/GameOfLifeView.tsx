@@ -43,6 +43,14 @@ const GameOfLifeView = ({
       clientX = event.clientX
       clientY = event.clientY
     }
+    const onTouchMove = (event) => {
+      clientX = event.touches[0].clientX
+      clientY = event.touches[0].clientY
+    }
+    const onTouchEnd = (event) => {
+      clientX = 0
+      clientY = 0
+    }
 
     let animationMustStop = false
     let frameCount = 0
@@ -97,9 +105,13 @@ const GameOfLifeView = ({
 
 
     document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('touchmove', onTouchMove)
+    document.addEventListener('touchend', onTouchEnd)
     animation()
     return () => {
       document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
       animationMustStop = true
     }
   }, [rowCount, columnCount])
