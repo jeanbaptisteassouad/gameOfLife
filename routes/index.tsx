@@ -1,56 +1,50 @@
 import { Head } from '$fresh/runtime.ts'
+import { Handlers, PageProps } from '$fresh/server.ts'
 import HomeIsland from '../islands/HomeIsland.tsx'
+import HeadStyleComponent from '../components/HeadStyleComponent.tsx'
 
-export default function Home() {
+
+import { WordingT, allWording } from '../wording/HomeWording.ts'
+
+type Props = {
+  wording: WordingT,
+}
+
+export const handler: Handlers<Props> = {
+  GET: async (req, ctx) => {
+    const searchParams = new URLSearchParams(new URL(req.url).search)
+    const lang = searchParams.get('lang') ?? chooseDefaultLang(req)
+    let wording = allWording.en
+    if (lang === 'fr') {
+      wording = allWording.fr
+    }
+
+    return ctx.render({wording})
+  },
+}
+
+export default function Home(props: PageProps<Props>) {
   return (
     <>
       <Head>
-        <title>Game of Life</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-        <style>
-          {`
-            @font-face {
-              font-family: titleFont;
-              src: url('/Pacifico/Pacifico-Regular.ttf');
-            }
-
-            @font-face {
-              font-family: myFont;
-              src: url('/Roboto_Mono/static/RobotoMono-Regular.ttf');
-            }
-
-            * {
-              font-family: myFont;
-            }
-
-
-            html {
-              --var-body-height: 100vh;
-
-              --var-title-font-size: 4rem;
-              --var-font-size: 16px;
-              --var-main-gap: 2rem;
-
-              font-size: var(--var-font-size);
-              height: var(--var-body-height);
-            }
-
-            body {
-              overflow: hidden;
-              height: var(--var-body-height);
-            }
-
-            @media (max-width: 800px) {
-              html {
-                --var-title-font-size: 2rem;
-                --var-font-size: 14px;
-                --var-main-gap: 1rem;
-              }
-            }
-          `}
-        </style>
+        <HeadStyleComponent wording={props.data.wording}/>
       </Head>
-      <HomeIsland/>
+      <HomeIsland wording={props.data.wording}/>
     </>
   )
+}
+
+const chooseDefaultLang = (req: Request): 'fr' | 'en' => {
+  const arrayOfLangs = req.headers.get('accept-language')
+    ?.split(',')
+    ?.map((a) => a.split(';')[0])
+    ?.map(a => a.split('-')[0]) ?? []
+
+  for (const lang of arrayOfLangs) {
+    if (lang === 'fr' || lang === 'en') {
+      return lang
+    }
+  }
+
+  return 'en'
 }

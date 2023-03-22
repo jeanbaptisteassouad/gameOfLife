@@ -5,8 +5,15 @@ import {
 
 import GameOfLifeView from '../components/GameOfLifeView.tsx'
 import WorldSizePickerView from '../components/WorldSizePickerView.tsx'
+import LanguagePickerView from '../components/LanguagePickerView.tsx'
 
-const HomeIsland = () => {
+import { WordingT } from '../wording/HomeWording.ts'
+
+const HomeIsland = ({
+  wording,
+}: {
+  wording: WordingT,
+}) => {
   const [rowCount, setRowCount] = useState(30)
   const [columnCount, setColumnCount] = useState(30)
 
@@ -23,28 +30,15 @@ const HomeIsland = () => {
 
 
   return (
-    <>
-      <style>
-        {`
-          body {
-            margin: 0;
-            padding: 2rem;
-            box-sizing: border-box;
-            background: #f4f4f4;
-          }
-
-          button {
-            line-height: 1;
-            padding: 0.5rem 1rem;
-            width: 8rem;
-            cursor: pointer;
-            font-size: 1rem;
-            border-radius: 0.25rem;
-            outline: none;
-            border: 2px solid;
-          }
-        `}
-      </style>
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}>
+      <div style={{maxWidth: '32rem', width: '100%', paddingBottom: 'var(--var-language-picker-bottom-padding)'}}>
+        <LanguagePickerView wording={wording}/>
+      </div>
       <div style={{
         height: '100%',
         display: 'flex',
@@ -53,14 +47,14 @@ const HomeIsland = () => {
         gap: 'var(--var-main-gap)',
       }}>
         <div style={{fontSize: 'var(--var-title-font-size)', fontFamily: 'titleFont'}}>
-          Game of Life
+          {wording.body.title}
         </div>
         <div style={{maxWidth: '32rem'}}>
           <div>
-            « The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. »
+            {wording.body.descriptionOfWikipedia}
           </div>
           <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-            <a href={'https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life'}>Wikipedia</a>
+            <a href={wording.body.wikipediaURL}>Wikipedia</a>
           </div>
         </div>
         <div style={{maxWidth: '45rem'}}>
@@ -75,10 +69,10 @@ const HomeIsland = () => {
           <GameOfLifeView rowCount={rowCount} columnCount={columnCount}/>
         </div>
         <div>
-          Made by Jean-Baptiste Assouad
+          {wording.body.madeBy}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

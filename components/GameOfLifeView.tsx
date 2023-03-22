@@ -3,9 +3,43 @@ import {
   useLayoutEffect,
 } from 'preact/hooks'
 
+type CellT = {
+  element: SuperHTMLDivElementT,
+  boundingClientRect: BoundingClientRectT,
+  isAlive: boolean,
+  nextIsAlive: boolean,
+  backgroundH: number,
+  nextBackgroundH: number,
+  backgroundS: number,
+  nextBackgroundS: number,
+  backgroundL: number,
+  nextBackgroundL: number,
+}
+
+type SuperHTMLDivElementT = {
+  isAlive: boolean,
+  style: {
+    background: string,
+  },
+  backgroundH: number,
+  backgroundS: number,
+  backgroundL: number,
+  getBoundingClientRect: () => BoundingClientRectT,
+}
+
+type BoundingClientRectT = {
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+}
+
 const GameOfLifeView = ({
   rowCount,
   columnCount,
+}: {
+  rowCount: number,
+  columnCount: number,
 }) => {
     const arrayOfCells = useMemo(() => {
     const arrayOfCells = []
@@ -39,15 +73,15 @@ const GameOfLifeView = ({
     let clientX = 0
     let clientY = 0
 
-    const onMouseMove = (event) => {
+    const onMouseMove = (event: MouseEvent) => {
       clientX = event.clientX
       clientY = event.clientY
     }
-    const onTouchMove = (event) => {
+    const onTouchMove = (event: TouchEvent) => {
       clientX = event.touches[0].clientX
       clientY = event.touches[0].clientY
     }
-    const onTouchEnd = (event) => {
+    const onTouchEnd = (event: TouchEvent) => {
       clientX = 0
       clientY = 0
     }
@@ -60,10 +94,11 @@ const GameOfLifeView = ({
         return
       }
 
-      const arrayOfCells = []
+      const arrayOfCells: Array<CellT> = []
 
       // read
-      document.querySelectorAll('.Cell').forEach((element) => {
+      document.querySelectorAll('.Cell').forEach((_element) => {
+        const element = _element as unknown as SuperHTMLDivElementT
         arrayOfCells.push({
           element,
           boundingClientRect: element.getBoundingClientRect(),
@@ -170,6 +205,10 @@ const mouseIsInRect = ({
   boundingClientRect,
   clientX,
   clientY,
+}: {
+  boundingClientRect: BoundingClientRectT,
+  clientX: number,
+  clientY: number,
 }) => {
   return (
     boundingClientRect.x <= clientX && clientX <= boundingClientRect.x + boundingClientRect.width &&
@@ -183,9 +222,15 @@ const simulateLife = ({
   index,
   rowCount,
   columnCount,
+}: {
+  arrayOfCells: Array<CellT>,
+  cell: CellT,
+  index: number,
+  rowCount: number,
+  columnCount: number,
 }) => {
   const len = rowCount * columnCount
-  const cap = (a) => {
+  const cap = (a: number) => {
     if (a < 0) {
       return a % len + len
     } else {
@@ -222,5 +267,5 @@ const simulateLife = ({
   }
 }
 
-const draw = (array) => array[Math.floor(Math.random() * array.length)]
-const mean = (array) => array.reduce((acc, val) => acc + val, 0) / array.length
+const draw = <T extends unknown>(array: Array<T>) => array[Math.floor(Math.random() * array.length)]
+const mean = (array: Array<number>) => array.reduce((acc, val) => acc + val, 0) / array.length
