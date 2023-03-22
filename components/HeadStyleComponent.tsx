@@ -36,6 +36,9 @@ const HeadStyleComponent = ({
 
             font-size: var(--var-font-size);
             height: var(--var-body-height);
+
+            user-select: none;
+            background: hsl(180 5% 92% / 1);
           }
 
           @media (max-width: 800px) {
@@ -54,7 +57,13 @@ const HeadStyleComponent = ({
             margin: 0;
             padding: 2rem;
             box-sizing: border-box;
-            background: linear-gradient(312deg, hsl(0 0% 96% / 1), hsl(0 0% 92% / 1));
+
+            background: linear-gradient(0deg, hsl(180 5% 96% / 1), hsl(180 5% 92% / 1));
+            color: hsl(180deg 36.36% 12.94%);
+          }
+
+          a {
+            color: hsl(180 36% 45% / 1);
           }
 
           button {
@@ -66,6 +75,9 @@ const HeadStyleComponent = ({
             border-radius: 0.25rem;
             outline: none;
             border: 2px solid;
+
+            background: hsl(180deg 27.66% 91.66%);
+            color: hsl(180deg 56.61% 19.73%);
           }
         `}
       </style>

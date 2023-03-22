@@ -66,7 +66,7 @@ const HomeIsland = ({
           />
         </div>
         <div style={{flex: '1 0 auto', aspectRatio: '1', maxWidth: '100%'}}>
-          <GameOfLifeView rowCount={rowCount} columnCount={columnCount}/>
+          <GameOfLifeView rowCount={rowCount} columnCount={columnCount} wording={wording}/>
         </div>
         <div>
           {wording.body.madeBy}

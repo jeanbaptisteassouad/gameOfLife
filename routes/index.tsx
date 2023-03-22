@@ -14,10 +14,7 @@ export const handler: Handlers<Props> = {
   GET: async (req, ctx) => {
     const searchParams = new URLSearchParams(new URL(req.url).search)
     const lang = searchParams.get('lang') ?? chooseDefaultLang(req)
-    let wording = allWording.en
-    if (lang === 'fr') {
-      wording = allWording.fr
-    }
+    const wording = chooseWording(lang)
 
     return ctx.render({wording})
   },
@@ -34,17 +31,21 @@ export default function Home(props: PageProps<Props>) {
   )
 }
 
-const chooseDefaultLang = (req: Request): 'fr' | 'en' => {
+const chooseDefaultLang = (req: Request): 'fr' | 'en' | 'de' => {
   const arrayOfLangs = req.headers.get('accept-language')
     ?.split(',')
     ?.map((a) => a.split(';')[0])
     ?.map(a => a.split('-')[0]) ?? []
 
   for (const lang of arrayOfLangs) {
-    if (lang === 'fr' || lang === 'en') {
+    if (lang === 'fr' || lang === 'en' || lang === 'de') {
       return lang
     }
   }
 
   return 'en'
+}
+
+const chooseWording = (lang: string) => {
+  return (allWording as Record<string, WordingT>)[lang] ?? allWording.en
 }
