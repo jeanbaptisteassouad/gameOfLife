@@ -29,10 +29,14 @@ const HomeIsland = ({
   }, [])
 
 
+  // We use dangerouslySetInnerHTML because the " inside
+  // grid-template-areas are escaped in html.
+  // Without javascript, the grid-template-areas does not work.
+  // All " are replace by &quot.
   return (
     <>
-      <style>
-        {`
+      <style dangerouslySetInnerHTML={{
+        __html: `
           .HomeIsland_Grid {
             grid-template-areas:
               "MainTitle GameOfLifeView"
@@ -55,8 +59,8 @@ const HomeIsland = ({
               grid-template-columns: 1fr;
             }
           }
-        `}
-      </style>
+        `
+      }}/>
       <div style={{
         height: '100%',
         display: 'flex',
