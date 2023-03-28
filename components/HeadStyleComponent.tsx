@@ -32,7 +32,6 @@ const HeadStyleComponent = ({
             --var-title-font-size: 4rem;
             --var-font-size: 16px;
             --var-main-gap: 2rem;
-            --var-language-picker-bottom-padding: 0rem;
 
             font-size: var(--var-font-size);
             height: var(--var-body-height);
@@ -46,7 +45,6 @@ const HeadStyleComponent = ({
               --var-title-font-size: 2rem;
               --var-font-size: 14px;
               --var-main-gap: 1rem;
-              --var-language-picker-bottom-padding: 1rem;
             }
           }
 

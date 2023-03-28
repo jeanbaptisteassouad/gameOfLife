@@ -156,6 +156,31 @@ const GameOfLifeView = ({
     }
   }, [rowCount, columnCount])
 
+  useLayoutEffect(() => {
+    const resize = () => {
+      const element = document.querySelector('.GameOfLifeView_Container')
+      if (element) {
+        const {width, height} = element.getBoundingClientRect()
+
+        const min = Math.min(width, height)
+
+        const child = element.childNodes[0]
+
+        if (child instanceof HTMLDivElement) {
+          child.style.width = `${min}px`
+          child.style.height = `${min}px`
+        }
+      }
+    }
+
+    resize()
+    setTimeout(resize, 100)
+    window.addEventListener('resize', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
+
   return (
     <>
       <style>
@@ -186,20 +211,24 @@ const GameOfLifeView = ({
           }
 */}        `}
       </style>
-      <div style={{position: 'relative'}}>
-        <div className='World' style={{
-          aspectRatio: '1 / 1',
-          display: 'grid',
-          gridTemplateRows,
-          gridTemplateColumns,
-        }}>
-          {arrayOfCells.map((cell) => {
-            return (
-              <div className='Cell'/>
-            )
-          })}
+      <div className='GameOfLifeView_Container' style={{position: 'relative', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{position: 'absolute'}}>
+          <div style={{position: 'relative', width: '100%', height: '100%'}}>
+            <div className='World' style={{
+              display: 'grid',
+              gridTemplateRows,
+              gridTemplateColumns,
+              height: '100%',
+            }}>
+              {arrayOfCells.map((cell) => {
+                return (
+                  <div className='Cell'/>
+                )
+              })}
+            </div>
+            <OverlayView wording={wording}/>
+          </div>
         </div>
-        <OverlayView wording={wording}/>
       </div>
     </>
   )
