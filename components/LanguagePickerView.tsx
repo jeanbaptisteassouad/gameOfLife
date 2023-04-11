@@ -70,6 +70,7 @@ const MenuView = ({
   setMenuIsOpen: (a: boolean) => void,
 }) => {
   useClickOutside({
+    selector: '.LanguagePickerView_MenuView',
     setMenuIsOpen,
   })
 
@@ -118,12 +119,14 @@ const ListOfLinks = ({
 }
 
 const useClickOutside = ({
+  selector,
   setMenuIsOpen,
 }: {
+  selector: string,
   setMenuIsOpen: (a: boolean) => void,
 }) => {
   useEffect(() => {
-    const element = document.querySelector('.LanguagePickerView_MenuView')
+    const element = document.querySelector(selector)
 
     if (!element) {
       return
@@ -145,5 +148,5 @@ const useClickOutside = ({
       element.removeEventListener('click', onClick)
       document.removeEventListener('click', onClickOutside)
     }
-  })
+  }, [selector])
 }

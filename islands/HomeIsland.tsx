@@ -98,7 +98,12 @@ const HomeIsland = ({
             <GameOfLifeView rowCount={rowCount} columnCount={columnCount} wording={wording}/>
           </div>
           <div style={{gridArea: 'MadeBy', display: 'flex', justifyContent: 'center'}}>
-            {wording.body.madeBy}
+            <span>
+              {wording.body.madeBy + ' • '}
+            </span>
+            <a href='https://github.com/jeanbaptisteassouad/gameOfLife'>
+              GitHub
+            </a>
           </div>
         </div>
       </div>

@@ -1,11 +1,36 @@
-# fresh project
+# Game of Life
 
-### Usage
+## Description
 
-Start the project:
+The Game of Life is a cellular automaton devised by the British mathematician John Horton Conway in 1970.
+
+This project is inspired by his work. It follows the same rule but we add two more properties :
+- the mouse or the finger is used to create life on the board
+- each cell have a color that is set when the cell become alive :
+  - either randomly (because of the mouse or the finger)
+  - or using a sort of mean between its alive neighbor (because of having 3 alive neighbor)
+
+The project is localized in multiple languages.
+
+The project supports multiple screen sizes and has two layouts.
+One for the mobile and one for the screen with width greater than 800px.
+
+## Usage
+
+To start the app run :
 
 ```
 deno task start
 ```
 
-This will watch the project directory and restart as necessary.
+To typecheck and start the app run :
+
+```
+deno task check
+```
+
+To deploy on deno deploy, run :
+
+```
+(export DENO_DEPLOY_TOKEN=${YOUR_SECRET_TOKEN_HERE} && deployctl deploy --project=game-of-life-42 main.ts)
+```

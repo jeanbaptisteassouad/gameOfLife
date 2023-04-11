@@ -6,6 +6,8 @@ import {
 
 import { WordingT } from '../wording/HomeWording.ts'
 
+import OverlayView from './OverlayView.tsx'
+
 type CellT = {
   element: SuperHTMLDivElementT,
   boundingClientRect: BoundingClientRectT,
@@ -46,140 +48,21 @@ const GameOfLifeView = ({
   rowCount: number,
   columnCount: number,
 }) => {
-    const arrayOfCells = useMemo(() => {
-    const arrayOfCells = []
-    for (let x = 0; x < rowCount; x++) {
-      for (let y = 0; y < columnCount; y++) {
-        arrayOfCells.push({
-          id: randomString(),
-        })
-      }
-    }
-    return arrayOfCells
-  }, [rowCount, columnCount])
+  const {
+    initialArrayOfCells,
+    gridTemplateRows,
+    gridTemplateColumns,
+  } = useInitial({
+    rowCount,
+    columnCount,
+  })
 
-  const gridTemplateRows = useMemo(() => {
-    const gridTemplateRows = []
-    for (let x = 0; x < rowCount; x++) {
-      gridTemplateRows.push('1fr')
-    }
-    return gridTemplateRows.join(' ')
-  }, [rowCount])
+  useGameOfLifeAnimation({
+    rowCount,
+    columnCount,
+  })
 
-  const gridTemplateColumns = useMemo(() => {
-    const gridTemplateColumns = []
-    for (let y = 0; y < columnCount; y++) {
-      gridTemplateColumns.push('1fr')
-    }
-    return gridTemplateColumns.join(' ')
-  }, [columnCount])
-
-  useLayoutEffect(() => {
-    let clientX = 0
-    let clientY = 0
-
-    const onMouseMove = (event: MouseEvent) => {
-      clientX = event.clientX
-      clientY = event.clientY
-    }
-    const onTouchMove = (event: TouchEvent) => {
-      clientX = event.touches[0].clientX
-      clientY = event.touches[0].clientY
-    }
-    const onTouchEnd = (event: TouchEvent) => {
-      clientX = 0
-      clientY = 0
-    }
-
-    let animationMustStop = false
-    let frameCount = 0
-
-    const animation = () => {
-      if (animationMustStop) {
-        return
-      }
-
-      const arrayOfCells: Array<CellT> = []
-
-      // read
-      document.querySelectorAll('.Cell').forEach((_element) => {
-        const element = _element as unknown as SuperHTMLDivElementT
-        arrayOfCells.push({
-          element,
-          boundingClientRect: element.getBoundingClientRect(),
-
-          isAlive: Boolean(element.isAlive),
-          nextIsAlive: Boolean(element.isAlive),
-          backgroundH: element.backgroundH,
-          nextBackgroundH: element.backgroundH,
-          backgroundS: element.backgroundS,
-          nextBackgroundS: element.backgroundS,
-          backgroundL: element.backgroundL,
-          nextBackgroundL: element.backgroundL,
-        })
-      })
-
-      arrayOfCells.forEach((cell, index) => {
-        if (mouseIsInRect({boundingClientRect: cell.boundingClientRect, clientX, clientY})) {
-          cell.nextIsAlive = true
-          cell.nextBackgroundH = Math.floor(Math.random() * 360)
-          cell.nextBackgroundS = Math.floor(Math.random() * 101)
-          cell.nextBackgroundL = Math.floor(Math.random() * 101)
-        } else if (frameCount % 8 === 0) {
-          simulateLife({arrayOfCells, cell, index, rowCount, columnCount})
-        }
-      })
-
-      // write
-      arrayOfCells.forEach((cell) => {
-        cell.element.isAlive = cell.nextIsAlive
-        cell.element.style.background = `hsl(${cell.nextBackgroundH}, ${cell.nextBackgroundS}%, ${cell.nextBackgroundL}%)`
-        cell.element.backgroundH = cell.nextBackgroundH
-        cell.element.backgroundS = cell.nextBackgroundS
-        cell.element.backgroundL = cell.nextBackgroundL
-      })
-
-      frameCount++
-      requestAnimationFrame(animation)
-    }
-
-
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('touchmove', onTouchMove)
-    document.addEventListener('touchend', onTouchEnd)
-    animation()
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('touchmove', onTouchMove)
-      document.removeEventListener('touchend', onTouchEnd)
-      animationMustStop = true
-    }
-  }, [rowCount, columnCount])
-
-  useLayoutEffect(() => {
-    const resize = () => {
-      const element = document.querySelector('.GameOfLifeView_Container')
-      if (element) {
-        const {width, height} = element.getBoundingClientRect()
-
-        const min = Math.min(width, height)
-
-        const child = element.childNodes[0]
-
-        if (child instanceof HTMLDivElement) {
-          child.style.width = `${min}px`
-          child.style.height = `${min}px`
-        }
-      }
-    }
-
-    resize()
-    setTimeout(resize, 100)
-    window.addEventListener('resize', resize)
-    return () => {
-      window.removeEventListener('resize', resize)
-    }
-  }, [])
+  useResizeFirstContainerChild()
 
   return (
     <>
@@ -220,7 +103,7 @@ const GameOfLifeView = ({
               gridTemplateColumns,
               height: '100%',
             }}>
-              {arrayOfCells.map((cell) => {
+              {initialArrayOfCells.map((cell) => {
                 return (
                   <div className='Cell'/>
                 )
@@ -236,7 +119,169 @@ const GameOfLifeView = ({
 
 export default GameOfLifeView
 
+const useInitial = ({
+  rowCount,
+  columnCount,
+}: {
+  rowCount: number,
+  columnCount: number,
+}) => {
+  const initialArrayOfCells = useMemo(() => {
+    const arrayOfCells = []
+    for (let x = 0; x < rowCount; x++) {
+      for (let y = 0; y < columnCount; y++) {
+        arrayOfCells.push({
+          id: randomString(),
+        })
+      }
+    }
+    return arrayOfCells
+  }, [rowCount, columnCount])
+
+  const gridTemplateRows = useMemo(() => {
+    const gridTemplateRows = []
+    for (let x = 0; x < rowCount; x++) {
+      gridTemplateRows.push('1fr')
+    }
+    return gridTemplateRows.join(' ')
+  }, [rowCount])
+
+  const gridTemplateColumns = useMemo(() => {
+    const gridTemplateColumns = []
+    for (let y = 0; y < columnCount; y++) {
+      gridTemplateColumns.push('1fr')
+    }
+    return gridTemplateColumns.join(' ')
+  }, [columnCount])
+
+  return {
+    initialArrayOfCells,
+    gridTemplateRows,
+    gridTemplateColumns,
+  }
+}
+
 const randomString = () => Math.random().toString(36).slice(2)
+
+const useGameOfLifeAnimation = ({
+  rowCount,
+  columnCount,
+}: {
+  rowCount: number,
+  columnCount: number,
+}) => {
+  useLayoutEffect(() => {
+    const state = {
+      clientX: 0,
+      clientY: 0,
+    }
+
+    const onMouseMove = (event: MouseEvent) => {
+      state.clientX = event.clientX
+      state.clientY = event.clientY
+    }
+    const onTouchMove = (event: TouchEvent) => {
+      state.clientX = event.touches[0].clientX
+      state.clientY = event.touches[0].clientY
+    }
+    const onTouchEnd = (event: TouchEvent) => {
+      state.clientX = 0
+      state.clientY = 0
+    }
+
+    const {
+      startAnimation,
+      stopAnimation,
+    } = createAnimation({
+      rowCount,
+      columnCount,
+      state,
+    })
+
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('touchmove', onTouchMove)
+    document.addEventListener('touchend', onTouchEnd)
+    startAnimation()
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
+      stopAnimation()
+    }
+  }, [rowCount, columnCount])
+}
+
+const createAnimation = ({
+  rowCount,
+  columnCount,
+  state,
+}: {
+  rowCount: number,
+  columnCount: number,
+  state: { clientX: number, clientY: number },
+}) => {
+  let animationMustStop = false
+  let frameCount = 0
+
+  const animation = () => {
+    if (animationMustStop) {
+      return
+    }
+
+    const arrayOfCells: Array<CellT> = []
+
+    // To improve performance, we batch all the dom reading
+    // before doing any dom writing.
+
+    // read
+    document.querySelectorAll('.Cell').forEach((_element) => {
+      const element = _element as unknown as SuperHTMLDivElementT
+      arrayOfCells.push({
+        element,
+        boundingClientRect: element.getBoundingClientRect(),
+
+        isAlive: Boolean(element.isAlive),
+        nextIsAlive: Boolean(element.isAlive),
+        backgroundH: element.backgroundH,
+        nextBackgroundH: element.backgroundH,
+        backgroundS: element.backgroundS,
+        nextBackgroundS: element.backgroundS,
+        backgroundL: element.backgroundL,
+        nextBackgroundL: element.backgroundL,
+      })
+    })
+
+    arrayOfCells.forEach((cell, index) => {
+      if (mouseIsInRect({boundingClientRect: cell.boundingClientRect, clientX: state.clientX, clientY: state.clientY})) {
+        cell.nextIsAlive = true
+        cell.nextBackgroundH = Math.floor(Math.random() * 360)
+        cell.nextBackgroundS = Math.floor(Math.random() * 101)
+        cell.nextBackgroundL = Math.floor(Math.random() * 101)
+      } else if (frameCount % 8 === 0) {
+        simulateLifeForOneCell({arrayOfCells, cell, index, rowCount, columnCount})
+      }
+    })
+
+    // write
+    arrayOfCells.forEach((cell) => {
+      cell.element.isAlive = cell.nextIsAlive
+      cell.element.style.background = `hsl(${cell.nextBackgroundH}, ${cell.nextBackgroundS}%, ${cell.nextBackgroundL}%)`
+      cell.element.backgroundH = cell.nextBackgroundH
+      cell.element.backgroundS = cell.nextBackgroundS
+      cell.element.backgroundL = cell.nextBackgroundL
+    })
+
+    frameCount++
+    requestAnimationFrame(animation)
+  }
+
+  return {
+    startAnimation: animation,
+    stopAnimation: () => {
+      animationMustStop = true
+    },
+  }
+}
 
 const mouseIsInRect = ({
   boundingClientRect,
@@ -253,7 +298,7 @@ const mouseIsInRect = ({
   )
 }
 
-const simulateLife = ({
+const simulateLifeForOneCell = ({
   arrayOfCells,
   cell,
   index,
@@ -290,6 +335,10 @@ const simulateLife = ({
       cell.nextBackgroundH = draw(aliveNeighbors).backgroundH
       cell.nextBackgroundS = mean(aliveNeighbors.map(cell => cell.backgroundS))
       cell.nextBackgroundL = mean(aliveNeighbors.map(cell => cell.backgroundL))
+    } else {
+      cell.nextBackgroundH = cell.backgroundH
+      cell.nextBackgroundS = cell.backgroundS
+      cell.nextBackgroundL = cell.backgroundL
     }
   } else if (totalAliveCount === 2) {
     cell.nextIsAlive = cell.isAlive
@@ -307,42 +356,29 @@ const simulateLife = ({
 const draw = <T extends unknown>(array: Array<T>) => array[Math.floor(Math.random() * array.length)]
 const mean = (array: Array<number>) => array.reduce((acc, val) => acc + val, 0) / array.length
 
-const OverlayView = ({
-  wording,
-}: {
-  wording: WordingT,
-}) => {
-  const [opacity, setOpacity] = useState(1)
+const useResizeFirstContainerChild = () => {
+  useLayoutEffect(() => {
+    const resize = () => {
+      const element = document.querySelector('.GameOfLifeView_Container')
+      if (element) {
+        const {width, height} = element.getBoundingClientRect()
 
-  return (
-    <div
-      onMouseMove={() => setOpacity(0)}
-      onTouchMove={() => setOpacity(0)}
-      style={{
-        opacity,
-        position: 'absolute',
-        top: 0,
-        width: '100%',
-        height: '100%',
-        background: 'hsl(180deg 67.43% 11.09% / 15%)',
-        transition: 'opacity 0.3s ease',
-        padding: '1rem',
-        boxSizing: 'border-box',
-      }}
-    >
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 'var(--var-title-font-size)',
-        fontFamily: 'titleFont',
-        textAlign: 'center',
-        lineHeight: 1.5,
-      }}>
-        {wording.body.overlayMessage}
-      </div>
-    </div>
-  )
+        const min = Math.min(width, height)
+
+        const child = element.childNodes[0]
+
+        if (child instanceof HTMLDivElement) {
+          child.style.width = `${min}px`
+          child.style.height = `${min}px`
+        }
+      }
+    }
+
+    resize()
+    setTimeout(resize, 100)
+    window.addEventListener('resize', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+    }
+  }, [])
 }
