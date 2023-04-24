@@ -32,5 +32,5 @@ deno task check
 To deploy on deno deploy, run :
 
 ```
-(export DENO_DEPLOY_TOKEN=${YOUR_SECRET_TOKEN_HERE} && deployctl deploy --project=game-of-life-42 main.ts)
+(export DENO_DEPLOY_TOKEN=${YOUR_SECRET_TOKEN_HERE} && deno task deploy)
 ```

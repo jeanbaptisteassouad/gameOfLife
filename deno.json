@@ -1,7 +1,8 @@
 {
   "tasks": {
     "start": "deno run -A --watch=static/,routes/ dev.ts",
-    "check": "deno run -A --watch=static/,routes/ --check dev.ts"
+    "check": "deno run -A --watch=static/,routes/ --check dev.ts",
+    "deploy": "deployctl deploy --project=game-of-life-42 main.ts"
   },
   "importMap": "./import_map.json",
   "compilerOptions": {
